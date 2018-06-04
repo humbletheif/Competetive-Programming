@@ -1,0 +1,33 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class AutoMarket{
+    public:
+    	int maxSet(vector<int> cost, vector<int> features, vector<int> fixTimes);
+};
+
+int AutoMarket::maxSet(vector<int> cost, vector<int> features, vector<int> fixTimes){
+    int n=cost.size();
+    vector< pair<int, pair<int,int> > > A;
+    for(int i=0;i<n;i++)
+        A.push_back(make_pair(cost[i],make_pair(features[i],fixTimes[i])));
+    sort(A.begin(),A.end());
+    vector<int> d(n,0);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<i;j++){
+            if(A[i].first > A[j].first && A[i].second.first < A[j].second.first
+               			&& A[i].second.second > A[j].second.second)
+                {
+                	d[i]=max(d[i],d[j]+1);
+                	//cout<<d[i]<<endl;
+                }
+        }
+    }
+    int maxi=0;
+    for(int i=0;i<n;i++){
+        if(d[i] > maxi)
+            maxi=d[i];
+    }
+
+    return maxi+1;
+}
