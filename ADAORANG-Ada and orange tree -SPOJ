@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+#define SIZE 550010
+ 
+int n,query,root;
+vector<vector<int> > adj;
+int P[SIZE][21];
+vector<bool> visited;
+vector<int> level;
+vector<int> parent;
+vector<bitset<252> > S;
+ 
+ 
+void dfs(int node,int h,int par){
+	//cout<<node<<endl;
+	visited[node]=true;
+	level[node]=h;
+	P[node][0]=par;
+ 
+	for(int x:adj[node]){
+		if(visited[x])continue;
+		parent[x]=node;
+		dfs(x,h+1,node);
+		S[node]|=S[x];
+	}
+}
+ 
+ 
+int lca(int p,int q){
+	int lg;
+	if(level[p]<level[q])
+		swap(p,q);
+	for(lg=1;(1<<lg)<=level[p];lg++);
+	lg--;
+ 
+	for(int i=lg;i>=0;i--)
+		if(level[p]-(1<<i)>=level[q])
+			p=P[p][i];
+ 
+	if(p==q)
+		return p;
+ 
+	for(int i=lg;i>=0;i--){
+		if(P[p][i] !=-1 && P[p][i]!=P[q][i])
+			p=P[p][i],q=P[q][i];
+	}
+ 
+	return parent[p];
+ 
+}
+ 
+int main(){
+	ios_base::sync_with_stdio(false);
+	cin.tie(0);
+	int t;
+	cin>>t;
+	while(t--){
+		cin>>n>>query>>root;
+		S.clear();
+		adj.clear();
+		visited.clear();
+		level.clear();
+		parent.clear();
+		adj.resize(n+1);
+		S.resize(n+1);
+		visited.resize(n+1);
+		level.resize(n+1);
+		parent.resize(n+1);
+		for(int i=1;i<=n;i++)
+		{
+			int x;
+			cin>>x;
+			S[i].set(x);
+ 
+		}
+		for(int i=1;i<=n-1;i++){
+			int x,y;
+			cin>>x>>y;
+			x++;y++;
+			adj[x].push_back(y);
+			adj[y].push_back(x);
+		}
+		for(int i=1;i<=n;i++){
+			for(int j=0;j<20;j++)
+				P[i][j]=-1;
+		}
+		dfs(root+1,0,-1);
+ 
+		for(int j=1;(1<<j)<=n;j++){
+			for(int i=1;i<=n;i++){
+				if(P[i][j-1]!=-1)
+					P[i][j]=P[P[i][j-1]][j-1];
+			}
+		}
+ 
+		for(int i=0;i<query;i++){
+			int x,y;
+			cin>>x>>y;
+			x++;y++;
+			int ans=lca(x,y);
+			cout<<S[ans].count()<<"\n";
+		}
+ 
+	}
+	return 0;
+}
