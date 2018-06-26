@@ -1,0 +1,88 @@
+#include <bits/stdc++.h>
+using namespace std;
+ 
+#define pb	push_back
+#define all(C)	(C).begin(),(C).end()
+#define fastio()	ios_base::sync_with_stdio(false);cin.tie(0);
+const int N=30010;
+int a[N];
+int blnums;
+int b[200][10001];
+int n;
+int blk;
+ 
+void update(int bnum,int x,int val){
+	while(x>0){
+		b[bnum][x]+=val;
+		x -=(x&-x);
+	}
+}
+ 
+void init(){
+	//int blnum=sqrt(n);
+	int k=-1;
+	for(int i=0;i<n;i++){
+		if(i%blk==0)k++;
+			update(k,a[i],1);	
+	}
+	blnums=k+1;
+}
+ 
+int query(int l,int r,int val){
+	int x=l/blk;
+	int y=r/blk;
+	int ans=0;
+	if(x==y){
+		for(int i=l ;i<=r;i++){
+			ans+=(a[i]>val);
+		}
+		return ans;
+	}
+	x++;
+	for(int i=l;i<(x)*blk;i++)ans+=(a[i]>val);
+	for(int i=x;i<y;i++){
+		int pp=val+1;
+		while(pp<=10000){
+			ans+=b[i][pp];
+			pp += (pp & -pp);
+		}
+	}
+	for(int i=(y)*blk ; i<=r ;i++)ans+=(a[i]>val);
+	
+	return ans;
+}
+ 
+ 
+int main() {
+	// your code goes here
+	fastio();
+	cin>>n;
+	blk=sqrt(n);
+	for(int i=0;i<n;i++)cin>>a[i];
+	init();
+	
+	int q;
+	cin>>q;
+	while(q--){
+		int t;
+		cin>>t;
+		if(t==1){
+			int l,r,x;
+			cin>>l>>r>>x;
+			l--;r--;
+			int ans=query(l,r,x);
+			cout<<ans<<"\n";
+		}
+		else{
+			int pos,new_val;
+			cin>>pos>>new_val;
+			pos--;
+			int bbb=pos/blk;
+			update(bbb,a[pos],-1);
+			a[pos]=new_val;
+			update(bbb,new_val,1);
+		}
+	}
+	
+	return 0;
+} 
